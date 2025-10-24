@@ -18,3 +18,7 @@ export const query = async (sql, params) => {
     const [rows] = await pool.execute(sql, params);
     return rows;
 };
+
+// EXPORTACIÓN CRUCIAL: Exportamos el pool directamente.
+// Esto permite a los modelos usar pool.getConnection() para transacciones.
+export default pool;
