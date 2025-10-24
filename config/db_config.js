@@ -5,9 +5,9 @@ import mysql from 'mysql2/promise';
 // ¡IMPORTANTE! Reemplace estos valores con sus credenciales de MySQL Workbench.
 const pool = mysql.createPool({
     host: 'localhost',      // O su dirección IP de MySQL
-    user: '[USUARIO]',      // Por ejemplo: 'root'
-    password: '[CONTRASEÑA]', // Su contraseña de MySQL
-    database: '[BASE_DE_DATOS]', // El nombre de la base de datos (Ej: 'inventario_caducidad')
+    user: 'root',      // Por ejemplo: 'root'
+    password: '12345678', // Su contraseña de MySQL
+    database: 'api_caducidad', // El nombre de la base de datos (Ej: 'inventario_caducidad')
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
