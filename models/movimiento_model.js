@@ -56,9 +56,12 @@ const Movimiento = {
                 m.fecha,
                 m.id_producto,
                 p.nombre AS nombre_producto,
-                m.id_usuario
+                m.id_usuario,
+                u.nombre AS nombre_usuario
             FROM movimiento m
             INNER JOIN producto p ON m.id_producto = p.id_producto
+            -- Nuevo JOIN para unir la tabla de movimientos (m) con la tabla de usuarios (u)
+            INNER JOIN usuario u ON m.id_usuario = u.id_usuario
             ORDER BY m.fecha DESC;
         `;
 
