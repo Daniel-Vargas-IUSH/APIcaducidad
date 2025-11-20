@@ -1,44 +1,39 @@
-// app.js
+// app.js (CÓDIGO CORREGIDO Y LIMPIO)
+
 import express from 'express';
-import productoRoutes from '../routes/producto_routes.js'; // <--- 1. Primera vez
 import 'dotenv/config'; 
 import cors from 'cors';
 
 // Importar rutas
+import productoRoutes from '../routes/producto_routes.js';
 import authRoutes from '../routes/auth_routes.js';
-// --- NUEVA Importación: Rutas de Movimiento ---
 import movimientoRoutes from '../routes/movimiento_routes.js';
 
 const app = express();
 
-// Middleware para parsear JSON en las peticiones
-app.use(express.json());
-
 // --- MIDDLEWARES GLOBALES ---
+app.use(express.json()); // Parsear JSON en las peticiones
 app.use(cors()); // Habilitar CORS
 
-// Montaje de las rutas bajo el prefijo '/api'
-app.use('/api', productoRoutes);
-
-// Ruta de prueba
+// --- RUTAS DE PRUEBA Y RAIZ ---
 app.get('/', (req, res) => {
-    res.send('API Rastreador de Caducidad está funcionando. Use /api/productos y /api/alertas.');
+    res.send('API Rastreador de Caducidad está funcionando.');
 });
 
-// --- RUTAS ---
-app.use('/api/productos', productoRoutes); 
-app.use('/api/auth', authRoutes);         // Montar rutas de Autenticación
-// --- NUEVA INTEGRACIÓN DE RUTAS DE MOVIMIENTO ---
-app.use('/api/movimientos', movimientoRoutes); // Montar rutas de Movimiento
-
-// --- RUTA RAIZ (PARA VERIFICACIÓN) ---
 app.get('/api', (req, res) => {
-    res.json({ message: 'API Rastreador de Caducidad activa.', version: '1.0' });
+    res.json({ message: 'API Rastreador de Caducidad activa.', version: '1.0' });
 });
+
+// --- MONTAJE DE LAS RUTAS BAJO SUS PREFIJOS DEFINITIVOS ---
+// 🔑 CLAVE: Solo un montaje para cada ruta.
+app.use('/api/productos', productoRoutes);  // Rutas de Producto
+app.use('/api/auth', authRoutes);         // Rutas de Autenticación
+app.use('/api/movimientos', movimientoRoutes); // Rutas de Movimiento
 
 // --- MANEJO DE ERRORES (Middleware final) ---
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Algo salió mal en el servidor.');
+    console.error(err.stack);
+    res.status(500).send('Algo salió mal en el servidor.');
 });
+
 export default app;

@@ -1,30 +1,34 @@
-// routes/producto_routes.js
+// routes/producto_routes.js (VERSIÓN FINAL CORREGIDA)
+
 import express from 'express';
 import { 
-    getAllProducts, getProductById, createProduct, 
-    updateProduct, deleteProduct, getAlerts 
+    getAllProducts, getProductById, createProduct, 
+    updateProduct, deleteProduct, getAlerts 
 } from '../controllers/producto_controller.js';
+// 🔑 1. IMPORTAR EL MIDDLEWARE DE SEGURIDAD
+import { verifyAdmin, verifyAuth } from '../middleware/auth_middleware.js'; 
 
 const router = express.Router();
 
-// Rutas CRUD básicas
-// GET /api/productos -> Obtener todos los productos
-// POST /api/productos -> Crear nuevo producto
-router.route('/productos')
-    .get(getAllProducts)
-    .post(createProduct);
+// Rutas CRUD básicas (Ruta base: '/')
+// GET /api/productos
+// POST /api/productos
+router.route('/')
+    .get(verifyAuth, getAllProducts) // 💡 Requiere Auth para ver la lista
+    .post(verifyAdmin, createProduct); // 🔒 2. APLICAR verifyAdmin (POST)
 
-// GET /api/productos/:id_producto -> Obtener por ID
-// PUT /api/productos/:id_producto -> Actualizar por ID
-// DELETE /api/productos/:id_producto -> Eliminar por ID
-router.route('/productos/:id_producto')
-    .get(getProductById)
-    .put(updateProduct)
-    .delete(deleteProduct);
+// Rutas con ID (Ruta: '/:id_producto')
+// GET /api/productos/:id_producto
+// PUT /api/productos/:id_producto
+// DELETE /api/productos/:id_producto
+router.route('/:id_producto')
+    .get(verifyAuth, getProductById) // 💡 Requiere Auth para ver detalle
+    .put(verifyAdmin, updateProduct)    // 🔒 2. APLICAR verifyAdmin (PUT)
+    .delete(verifyAdmin, deleteProduct); // 🔒 2. APLICAR verifyAdmin (DELETE)
 
-// Ruta Diferencial: Alertas
-// GET /api/alertas -> Obtener alertas rojas y amarillas
+// Ruta Diferencial: Alertas (Ruta: '/alertas')
+// GET /api/productos/alertas
 router.route('/alertas')
-    .get(getAlerts);
+    .get(verifyAuth, getAlerts); // 🔒 Requiere Auth para ver alertas
 
 export default router;
