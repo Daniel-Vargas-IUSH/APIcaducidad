@@ -2,14 +2,17 @@
 
 import express from 'express';
 import movimientoController from '../controllers/movimiento_controller.js';
+// 🔑 CORRECCIÓN: Usar la ruta y nombres correctos confirmados por tu ejemplo.
+import { verifyAdmin, verifyAuth } from '../middleware/auth_middleware.js'; 
 
 const router = express.Router();
 
 // Define la ruta POST para crear un movimiento
-router.post('/', movimientoController.registrarMovimiento);
+// 🔒 RESTRICCIÓN: Solo Admin puede registrar movimientos (requiere estar logueado y ser Admin)
+router.post('/', verifyAuth, verifyAdmin, movimientoController.registrarMovimiento);
 
 // Ruta para obtener todos los movimientos
-// GET /api/movimientos
-router.get('/', movimientoController.obtenerMovimientos);
+// 💡 PROTECCIÓN: Solo usuarios logueados pueden ver el historial
+router.get('/', verifyAuth, movimientoController.obtenerMovimientos);
 
 export default router;
