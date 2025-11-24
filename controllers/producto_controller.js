@@ -47,9 +47,12 @@ export const getAlerts = async (req, res) => {
 
         const alerta_roja = [];
         const alerta_amarilla = [];
+        const alerta_expirada = []; // 👈 1. Nuevo array para expirados
 
         for (const p of productosEnriquecidos) {
-            if (p.estado_alerta === 'Roja') {
+            if (p.estado_alerta === 'Expirado') { // 👈 2. Captura productos expirados
+                alerta_expirada.push(p);
+            } else if (p.estado_alerta === 'Roja') {
                 alerta_roja.push(p);
             } else if (p.estado_alerta === 'Amarilla') {
                 alerta_amarilla.push(p);
@@ -57,9 +60,9 @@ export const getAlerts = async (req, res) => {
         }
 
         return res.json({
-            alerta_roja,
+            alerta_roja: [...alerta_expirada, ...alerta_roja], // 👈 3. COMBINAR: Ponemos los expirados en la lista roja
             alerta_amarilla,
-            explicacion: 'Roja: Caduca en <= 7 días. Amarilla: Caduca en 8 a 30 días.'
+            explicacion: 'Roja: Caduca en <= 7 días o ya expiró. Amarilla: Caduca en 8 a 30 días.'
         });
     } catch (error) {
         console.error("Error al obtener alertas:", error);
