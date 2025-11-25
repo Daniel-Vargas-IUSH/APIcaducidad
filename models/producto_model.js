@@ -17,12 +17,14 @@ export const ProductoModel = {
     },
 
     create: async (data) => {
-        const { nombre, cantidad, fecha_caducidad, ubicacion } = data;
+        // 🔑 AÑADIMOS precio_costo y precio_venta a la desestructuración
+        const { nombre, cantidad, fecha_caducidad, ubicacion, precio_costo, precio_venta } = data;
         const sql = `
-            INSERT INTO Producto (nombre, cantidad, fecha_caducidad, ubicacion, fecha_ingreso) 
-            VALUES (?, ?, ?, ?, CURDATE())
+            INSERT INTO Producto (nombre, cantidad, fecha_caducidad, ubicacion, precio_costo, precio_venta, fecha_ingreso) 
+            VALUES (?, ?, ?, ?, ?, ?, CURDATE())
         `;
-        const result = await query(sql, [nombre, cantidad, fecha_caducidad, ubicacion]);
+        // 🔑 AÑADIMOS precio_costo y precio_venta a los parámetros
+        const result = await query(sql, [nombre, cantidad, fecha_caducidad, ubicacion, precio_costo, precio_venta]);
         
         // Retorna el producto recién creado
         return ProductoModel.findById(result.insertId);
@@ -34,7 +36,8 @@ export const ProductoModel = {
         const params = [];
         
         for (const key in data) {
-            if (['nombre', 'cantidad', 'fecha_caducidad', 'ubicacion'].includes(key)) {
+            // 🔑 AÑADIMOS precio_costo y precio_venta a los campos permitidos
+            if (['nombre', 'cantidad', 'fecha_caducidad', 'ubicacion', 'precio_costo', 'precio_venta'].includes(key)) {
                 updates.push(`${key} = ?`);
                 params.push(data[key]);
             }

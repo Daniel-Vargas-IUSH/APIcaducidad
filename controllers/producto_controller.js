@@ -47,10 +47,10 @@ export const getAlerts = async (req, res) => {
 
         const alerta_roja = [];
         const alerta_amarilla = [];
-        const alerta_expirada = []; // 👈 1. Nuevo array para expirados
+        const alerta_expirada = [];
 
         for (const p of productosEnriquecidos) {
-            if (p.estado_alerta === 'Expirado') { // 👈 2. Captura productos expirados
+            if (p.estado_alerta === 'Expirado') {
                 alerta_expirada.push(p);
             } else if (p.estado_alerta === 'Roja') {
                 alerta_roja.push(p);
@@ -60,7 +60,7 @@ export const getAlerts = async (req, res) => {
         }
 
         return res.json({
-            alerta_roja: [...alerta_expirada, ...alerta_roja], // 👈 3. COMBINAR: Ponemos los expirados en la lista roja
+            alerta_roja: [...alerta_expirada, ...alerta_roja], // COMBINAR: Ponemos los expirados en la lista roja
             alerta_amarilla,
             explicacion: 'Roja: Caduca en <= 7 días o ya expiró. Amarilla: Caduca en 8 a 30 días.'
         });
@@ -100,10 +100,14 @@ export const getProductById = async (req, res) => {
 export const createProduct = async (req, res) => {
     const data = req.body;
     
-    if (!data.nombre || !data.fecha_caducidad) {
-        return res.status(400).json({ error: 'Faltan campos obligatorios (nombre, fecha_caducidad).' });
+    // 🔑 VALIDACIÓN COMPLETA (Asegura que precio_costo, precio_venta y cantidad sean válidos)
+    if (!data.nombre || !data.fecha_caducidad || data.cantidad === undefined || 
+        data.precio_costo === undefined || data.precio_venta === undefined ||
+        isNaN(data.cantidad) || isNaN(data.precio_costo) || isNaN(data.precio_venta)) {
+        
+        return res.status(400).json({ error: 'Faltan campos obligatorios o los valores numéricos son inválidos (nombre, fecha_caducidad, cantidad, precio_costo, precio_venta).' });
     }
-
+    
     try {
         const newProduct = await ProductoModel.create(data);
         res.status(201).json(enrichProductData(newProduct));
@@ -116,6 +120,17 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
     const id = req.params.id_producto;
     const data = req.body;
+    
+    // 🔑 VALIDACIÓN BÁSICA DE LOS DATOS QUE SE ACTUALIZAN
+    if (data.cantidad !== undefined && isNaN(data.cantidad)) {
+        return res.status(400).json({ error: 'La cantidad debe ser un número válido.' });
+    }
+    if (data.precio_costo !== undefined && isNaN(data.precio_costo)) {
+        return res.status(400).json({ error: 'El precio de costo debe ser un número válido.' });
+    }
+    if (data.precio_venta !== undefined && isNaN(data.precio_venta)) {
+        return res.status(400).json({ error: 'El precio de venta debe ser un número válido.' });
+    }
     
     try {
         const updatedProduct = await ProductoModel.update(id, data);
